@@ -1,4 +1,9 @@
-
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Quick! Insulin Types</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f8f7f4;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:1rem}
@@ -46,6 +51,8 @@ canvas{position:absolute;inset:0;pointer-events:none;border-radius:20px}
 .replay-btn{width:100%;padding:13px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer}
 .replay-btn:hover{background:#333}
 </style>
+</head>
+<body>
 
 <div class="wrap" id="quizView">
   <div style="text-align:center;font-size:1.4rem;font-weight:800;color:#111">Quick! Insulin Types</div>
@@ -259,3 +266,5 @@ function stopConfetti(){if(raf){cancelAnimationFrame(raf);raf=null;}var cv=docum
 
 init();
 </script>
+</body>
+</html>
