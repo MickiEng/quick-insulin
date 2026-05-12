@@ -1,0 +1,261 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f8f7f4;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.wrap{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:1.25rem}
+.card{width:100%;background:#fff;border-radius:20px;border:1.5px solid #e0ddd6;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 2rem;position:relative;overflow:hidden;transition:border-color 0.3s,background 0.3s}
+.card.correct{border-color:#1D9E75;background:#f0fbf7}
+canvas{position:absolute;inset:0;pointer-events:none;border-radius:20px}
+.card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#aaa;margin-bottom:6px}
+.card-name{font-size:2.4rem;font-weight:800;color:#111;text-align:center;line-height:1}
+.progress-wrap{width:100%;display:flex;align-items:center;gap:10px}
+.prog-bar{flex:1;height:5px;background:#e0ddd6;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width 0.4s ease}
+.prog-lbl{font-size:12px;color:#aaa;font-weight:600;min-width:40px;text-align:right}
+.wheels-wrap{width:100%;background:#fff;border-radius:20px;border:1.5px solid #e0ddd6;padding:1rem 1rem 1.25rem}
+.wheels-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;text-align:center;margin-bottom:0.75rem}
+.wheels{display:flex;gap:8px;justify-content:center}
+.wheel-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+.wheel-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888}
+.wheel-btn{width:100%;height:32px;border:1.5px solid #ddd;border-radius:10px;background:#f8f7f4;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555;transition:background 0.15s;user-select:none}
+.wheel-btn:active{background:#e8e6e0}
+.wheel-btn:disabled{opacity:0.3;cursor:default}
+.wheel-window{width:100%;height:54px;border-radius:12px;border:1.5px solid #ddd;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:border-color 0.3s,background 0.3s}
+.wheel-window.ok{border-color:#1D9E75;background:#e1f5ee}
+.wheel-window.no{border-color:#e24b4a;background:#fcebeb;animation:shk 0.4s ease}
+.wt{font-size:13px;font-weight:700;color:#111;text-align:center;padding:0 6px;line-height:1.25}
+.wheel-window.ok .wt{color:#0F6E56}
+.wheel-window.no .wt{color:#a32d2d}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.submit-btn{width:100%;padding:14px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:background 0.15s}
+.submit-btn:hover{background:#333}
+.next-btn{width:100%;padding:14px;background:#1D9E75;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:background 0.15s}
+.next-btn:hover{background:#0F6E56}
+.results{width:100%;background:#fff;border-radius:20px;border:1px solid #e0ddd6;padding:2rem 1.5rem;display:none;flex-direction:column;align-items:center;gap:1.25rem}
+.results h2{font-size:1.5rem;font-weight:800;color:#111}
+.score-row{display:flex;gap:10px;width:100%}
+.stat{flex:1;background:#f8f7f4;border-radius:14px;padding:0.75rem;text-align:center}
+.stat .n{font-size:1.6rem;font-weight:800;color:#111;line-height:1}
+.stat .l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#aaa;margin-top:3px}
+.stat.g .n{color:#1D9E75}
+.stat.r .n{color:#e24b4a}
+.acc-lbl{display:flex;justify-content:space-between;font-size:12px;color:#aaa;margin-bottom:6px;font-weight:600}
+.acc-bg{width:100%;height:8px;background:#f0ede8;border-radius:4px;overflow:hidden}
+.acc-fill{height:100%;border-radius:4px;transition:width 0.6s ease}
+.remark{font-size:14px;color:#555;text-align:center;font-weight:500}
+.replay-btn{width:100%;padding:13px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer}
+.replay-btn:hover{background:#333}
+</style>
+
+<div class="wrap" id="quizView">
+  <div style="text-align:center;font-size:1.4rem;font-weight:800;color:#111">Quick! Insulin Types</div>
+  <div class="progress-wrap">
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="prog-lbl" id="progLbl">0 / 7</div>
+  </div>
+  <div class="card" id="card">
+    <canvas id="cv"></canvas>
+    <div class="card-label">Match the insulin</div>
+    <div class="card-name" id="cardName">—</div>
+  </div>
+  <div class="wheels-wrap">
+    <div class="wheels-title">Set Onset · Peak · Duration</div>
+    <div class="wheels">
+      <div class="wheel-col">
+        <div class="wheel-lbl">Onset</div>
+        <button class="wheel-btn" id="u0" onclick="cycle(0,-1)">▲</button>
+        <div class="wheel-window" id="w0"><div class="wt" id="wt0">—</div></div>
+        <button class="wheel-btn" id="d0" onclick="cycle(0,1)">▼</button>
+      </div>
+      <div class="wheel-col">
+        <div class="wheel-lbl">Peak</div>
+        <button class="wheel-btn" id="u1" onclick="cycle(1,-1)">▲</button>
+        <div class="wheel-window" id="w1"><div class="wt" id="wt1">—</div></div>
+        <button class="wheel-btn" id="d1" onclick="cycle(1,1)">▼</button>
+      </div>
+      <div class="wheel-col">
+        <div class="wheel-lbl">Duration</div>
+        <button class="wheel-btn" id="u2" onclick="cycle(2,-1)">▲</button>
+        <div class="wheel-window" id="w2"><div class="wt" id="wt2">—</div></div>
+        <button class="wheel-btn" id="d2" onclick="cycle(2,1)">▼</button>
+      </div>
+    </div>
+  </div>
+  <button class="submit-btn" id="submitBtn" onclick="submit()">Check Combination</button>
+  <button class="next-btn" id="nextBtn" onclick="nextCard()">Next Insulin →</button>
+</div>
+
+<div class="wrap" id="resultsView" style="display:none">
+  <div class="results" id="resultsCard" style="display:flex">
+    <div style="font-size:2.5rem">💉</div>
+    <h2>Round Complete!</h2>
+    <div class="score-row">
+      <div class="stat g"><div class="n" id="rCorrect">—</div><div class="l">First try</div></div>
+      <div class="stat r"><div class="n" id="rMissed">—</div><div class="l">Needed retries</div></div>
+      <div class="stat"><div class="n" id="rAttempts">—</div><div class="l">Total checks</div></div>
+    </div>
+    <div style="width:100%">
+      <div class="acc-lbl"><span>First-try accuracy</span><span id="rPct">—</span></div>
+      <div class="acc-bg"><div class="acc-fill" id="rBar" style="width:0%"></div></div>
+    </div>
+    <div class="remark" id="rRemark">—</div>
+    <button class="replay-btn" onclick="restart()">Play Again</button>
+  </div>
+</div>
+
+<script>
+var CARDS=[
+  {name:'Lispro',    o:0,p:0,d:0},
+  {name:'Aspart',    o:0,p:0,d:0},
+  {name:'Glulisine', o:0,p:0,d:0},
+  {name:'Regular',   o:1,p:1,d:1},
+  {name:'NPH',       o:2,p:2,d:2},
+  {name:'Glargine',  o:3,p:3,d:3},
+  {name:'Detemir',   o:3,p:3,d:3}
+];
+var ONSETS=['15 min','30–60 min','1–2 hrs','1–4 hrs'];
+var PEAKS=['1–3 hrs','2–4 hrs','4–12 hrs','No peak'];
+var DURS=['3–5 hrs','5–8 hrs','14–24 hrs','24 hrs'];
+
+var deck=[],cardIdx=0,cur=null;
+var sel=[0,0,0];
+var frozen=[false,false,false];
+var locked=false,done=false;
+var firstTryWrong=false;
+var correctCount=0,missedCount=0,totalChecks=0;
+
+function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+
+function init(){
+  deck=shuffle(CARDS);cardIdx=0;correctCount=0;missedCount=0;totalChecks=0;
+  firstTryWrong=false;frozen=[false,false,false];sel=[0,0,0];locked=false;done=false;cur=deck[0];
+  document.getElementById('quizView').style.display='flex';
+  document.getElementById('resultsView').style.display='none';
+  document.getElementById('submitBtn').style.display='block';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('card').className='card';
+  clearWheelStates();render();updateProgress();
+}
+
+function render(){
+  if(!cur)return;
+  document.getElementById('cardName').textContent=cur.name;
+  document.getElementById('wt0').textContent=ONSETS[sel[0]];
+  document.getElementById('wt1').textContent=PEAKS[sel[1]];
+  document.getElementById('wt2').textContent=DURS[sel[2]];
+}
+
+function cycle(w,dir){
+  if(done||frozen[w])return;
+  var lens=[ONSETS.length,PEAKS.length,DURS.length];
+  sel[w]=(sel[w]+dir+lens[w])%lens[w];
+  document.getElementById('w'+w).className='wheel-window';
+  render();
+}
+
+function clearWheelStates(){
+  for(var i=0;i<3;i++){
+    document.getElementById('w'+i).className='wheel-window';
+    document.getElementById('u'+i).disabled=false;
+    document.getElementById('d'+i).disabled=false;
+    frozen[i]=false;
+  }
+}
+
+function freezeWheel(w){
+  frozen[w]=true;
+  document.getElementById('w'+w).className='wheel-window ok';
+  document.getElementById('u'+w).disabled=true;
+  document.getElementById('d'+w).disabled=true;
+}
+
+function updateProgress(){
+  var pct=Math.round((cardIdx/7)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLbl').textContent=cardIdx+' / 7';
+}
+
+function submit(){
+  if(locked||done)return;
+  totalChecks++;
+  var c=cur;
+  var r0=sel[0]===c.o,r1=sel[1]===c.p,r2=sel[2]===c.d;
+  var allOk=r0&&r1&&r2;
+  if(allOk){
+    if(!firstTryWrong)correctCount++;else missedCount++;
+    done=true;
+    document.getElementById('card').className='card correct';
+    freezeWheel(0);freezeWheel(1);freezeWheel(2);
+    confetti();
+    document.getElementById('submitBtn').style.display='none';
+    document.getElementById('nextBtn').style.display='block';
+    document.getElementById('nextBtn').textContent=(cardIdx+1>=7)?'See Results →':'Next Insulin →';
+  } else {
+    if(!firstTryWrong)firstTryWrong=true;
+    locked=true;
+    if(r0)freezeWheel(0);else document.getElementById('w0').className='wheel-window no';
+    if(r1)freezeWheel(1);else document.getElementById('w1').className='wheel-window no';
+    if(r2)freezeWheel(2);else document.getElementById('w2').className='wheel-window no';
+    setTimeout(function(){
+      locked=false;
+      if(!frozen[0])document.getElementById('w0').className='wheel-window';
+      if(!frozen[1])document.getElementById('w1').className='wheel-window';
+      if(!frozen[2])document.getElementById('w2').className='wheel-window';
+    },700);
+  }
+}
+
+function nextCard(){
+  stopConfetti();
+  cardIdx++;
+  updateProgress();
+  if(cardIdx>=7){showResults();return;}
+  cur=deck[cardIdx];
+  firstTryWrong=false;done=false;sel=[0,0,0];
+  document.getElementById('card').className='card';
+  document.getElementById('submitBtn').style.display='block';
+  document.getElementById('nextBtn').style.display='none';
+  clearWheelStates();render();
+}
+
+function showResults(){
+  stopConfetti();
+  cardIdx=7;updateProgress();
+  var pct=Math.round((correctCount/7)*100);
+  var col=pct===100?'#1D9E75':pct>=71?'#378ADD':pct>=57?'#EF9F27':'#e24b4a';
+  var remarks=[[100,'Perfect — every insulin locked in! 🎉'],[71,'Strong round — a couple to review.'],[57,'Getting there — keep drilling.'],[0,'Keep at it — another round will help!']];
+  var rem=remarks[remarks.length-1][1];
+  for(var i=0;i<remarks.length;i++){if(pct>=remarks[i][0]){rem=remarks[i][1];break;}}
+  document.getElementById('rCorrect').textContent=correctCount;
+  document.getElementById('rMissed').textContent=missedCount;
+  document.getElementById('rAttempts').textContent=totalChecks;
+  document.getElementById('rPct').textContent=pct+'%';
+  document.getElementById('rBar').style.width=pct+'%';
+  document.getElementById('rBar').style.background=col;
+  document.getElementById('rRemark').textContent=rem;
+  document.getElementById('quizView').style.display='none';
+  document.getElementById('resultsView').style.display='flex';
+}
+
+function restart(){init();}
+
+var particles=[],raf=null;
+function confetti(){
+  var cv=document.getElementById('cv'),card=document.getElementById('card');
+  cv.width=card.offsetWidth;cv.height=card.offsetHeight;
+  var ctx=cv.getContext('2d');
+  var cols=['#1D9E75','#5DCAA5','#378ADD','#D4537E','#EF9F27','#7F77DD'];
+  particles=[];
+  for(var i=0;i<60;i++)particles.push({x:Math.random()*cv.width,y:-10-Math.random()*30,w:5+Math.random()*5,h:6+Math.random()*4,c:cols[Math.floor(Math.random()*cols.length)],vx:(Math.random()-0.5)*4,vy:2+Math.random()*3,a:Math.random()*Math.PI*2,spin:(Math.random()-0.5)*0.18,alpha:1});
+  if(raf)cancelAnimationFrame(raf);
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);var any=false;
+    particles.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.a+=p.spin;p.alpha-=0.018;if(p.alpha>0){any=true;ctx.save();ctx.globalAlpha=p.alpha;ctx.translate(p.x,p.y);ctx.rotate(p.a);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();}});
+    if(any)raf=requestAnimationFrame(draw);else ctx.clearRect(0,0,cv.width,cv.height);
+  }
+  draw();
+}
+function stopConfetti(){if(raf){cancelAnimationFrame(raf);raf=null;}var cv=document.getElementById('cv');if(cv)cv.getContext('2d').clearRect(0,0,cv.width,cv.height);}
+
+init();
+</script>
