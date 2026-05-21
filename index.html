@@ -7,33 +7,28 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f8f7f4;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:1rem}
-.wrap{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:1.25rem}
-.card{width:100%;background:#fff;border-radius:20px;border:1.5px solid #e0ddd6;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem 2rem;position:relative;overflow:hidden;transition:border-color 0.3s,background 0.3s}
-.card.correct{border-color:#1D9E75;background:#f0fbf7}
-canvas{position:absolute;inset:0;pointer-events:none;border-radius:20px}
-.card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#aaa;margin-bottom:6px}
-.card-name{font-size:2.4rem;font-weight:800;color:#111;text-align:center;line-height:1}
+.wrap{width:100%;max-width:460px;display:flex;flex-direction:column;align-items:center;gap:1.25rem}
 .progress-wrap{width:100%;display:flex;align-items:center;gap:10px}
 .prog-bar{flex:1;height:5px;background:#e0ddd6;border-radius:3px;overflow:hidden}
 .prog-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width 0.4s ease}
 .prog-lbl{font-size:12px;color:#aaa;font-weight:600;min-width:40px;text-align:right}
-.wheels-wrap{width:100%;background:#fff;border-radius:20px;border:1.5px solid #e0ddd6;padding:1rem 1rem 1.25rem}
-.wheels-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#bbb;text-align:center;margin-bottom:0.75rem}
-.wheels{display:flex;gap:8px;justify-content:center}
-.wheel-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px}
-.wheel-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#888}
-.wheel-btn{width:100%;height:32px;border:1.5px solid #ddd;border-radius:10px;background:#f8f7f4;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#555;transition:background 0.15s;user-select:none}
-.wheel-btn:active{background:#e8e6e0}
-.wheel-btn:disabled{opacity:0.3;cursor:default}
-.wheel-window{width:100%;height:54px;border-radius:12px;border:1.5px solid #ddd;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:border-color 0.3s,background 0.3s}
-.wheel-window.ok{border-color:#1D9E75;background:#e1f5ee}
-.wheel-window.no{border-color:#e24b4a;background:#fcebeb;animation:shk 0.4s ease}
-.wt{font-size:13px;font-weight:700;color:#111;text-align:center;padding:0 6px;line-height:1.25}
-.wheel-window.ok .wt{color:#0F6E56}
-.wheel-window.no .wt{color:#a32d2d}
+.card{width:100%;background:#fff;border-radius:20px;border:1.5px solid #e0ddd6;padding:1.25rem 1.5rem;position:relative;overflow:visible;transition:border-color 0.3s,background 0.3s}
+.card.correct{border-color:#1D9E75;background:#f0fbf7}
+.card.wrong{border-color:#e24b4a;animation:shk 0.4s ease}
+canvas#cv{position:absolute;inset:0;pointer-events:none;border-radius:20px;overflow:hidden}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
-.submit-btn{width:100%;padding:14px;background:#111;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;transition:background 0.15s}
-.submit-btn:hover{background:#333}
+.card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#aaa;margin-bottom:4px;text-align:center}
+.card-name{font-size:2.2rem;font-weight:800;color:#111;text-align:center;line-height:1;margin-bottom:1rem}
+.graph-wrap{width:100%;position:relative}
+.graph-canvas{width:100%;display:block;border-radius:8px}
+.axis-label-y{position:absolute;left:-18px;top:50%;transform:translateY(-50%) rotate(-90deg);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ccc}
+.axis-label-x{text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#ccc;margin-top:4px}
+.color-btns{display:flex;gap:12px;justify-content:center;margin-top:0.25rem}
+.cbtn{width:40px;height:40px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;outline:none;background:none;display:flex;align-items:center;justify-content:center}
+.cbtn:active{transform:scale(0.9)}
+.cbtn .dot{width:28px;height:28px;border-radius:50%}
+.cbtn.selected{border-color:#111;box-shadow:0 0 0 2px #11111133}
+.cbtn:disabled{opacity:0.4;cursor:default}
 .next-btn{width:100%;padding:14px;background:#1D9E75;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:background 0.15s}
 .next-btn:hover{background:#0F6E56}
 .results{width:100%;background:#fff;border-radius:20px;border:1px solid #e0ddd6;padding:2rem 1.5rem;display:none;flex-direction:column;align-items:center;gap:1.25rem}
@@ -62,38 +57,19 @@ canvas{position:absolute;inset:0;pointer-events:none;border-radius:20px}
   </div>
   <div class="card" id="card">
     <canvas id="cv"></canvas>
-    <div class="card-label">Match the insulin</div>
+    <div class="card-label">Which curve matches</div>
     <div class="card-name" id="cardName">—</div>
-  </div>
-  <div class="wheels-wrap">
-    <div class="wheels-title">Set Onset · Peak · Duration</div>
-    <div class="wheels">
-      <div class="wheel-col">
-        <div class="wheel-lbl">Onset</div>
-        <button class="wheel-btn" id="u0" onclick="cycle(0,-1)">▲</button>
-        <div class="wheel-window" id="w0"><div class="wt" id="wt0">—</div></div>
-        <button class="wheel-btn" id="d0" onclick="cycle(0,1)">▼</button>
-      </div>
-      <div class="wheel-col">
-        <div class="wheel-lbl">Peak</div>
-        <button class="wheel-btn" id="u1" onclick="cycle(1,-1)">▲</button>
-        <div class="wheel-window" id="w1"><div class="wt" id="wt1">—</div></div>
-        <button class="wheel-btn" id="d1" onclick="cycle(1,1)">▼</button>
-      </div>
-      <div class="wheel-col">
-        <div class="wheel-lbl">Duration</div>
-        <button class="wheel-btn" id="u2" onclick="cycle(2,-1)">▲</button>
-        <div class="wheel-window" id="w2"><div class="wt" id="wt2">—</div></div>
-        <button class="wheel-btn" id="d2" onclick="cycle(2,1)">▼</button>
-      </div>
+    <div class="graph-wrap" style="padding-left:24px">
+      <div class="axis-label-y">Effect</div>
+      <canvas class="graph-canvas" id="graphCanvas" height="200"></canvas>
     </div>
+    <div class="color-btns" id="colorBtns"></div>
   </div>
-  <button class="submit-btn" id="submitBtn" onclick="submit()">Check Combination</button>
   <button class="next-btn" id="nextBtn" onclick="nextCard()">Next Insulin →</button>
 </div>
 
 <div class="wrap" id="resultsView" style="display:none">
-  <div class="results" id="resultsCard" style="display:flex">
+  <div class="results" style="display:flex">
     <div style="font-size:2.5rem">💉</div>
     <h2>Round Complete!</h2>
     <div class="score-row">
@@ -111,69 +87,192 @@ canvas{position:absolute;inset:0;pointer-events:none;border-radius:20px}
 </div>
 
 <script>
-var CARDS=[
-  {name:'Lispro',    o:0,p:0,d:0},
-  {name:'Aspart',    o:0,p:0,d:0},
-  {name:'Glulisine', o:0,p:0,d:0},
-  {name:'Regular',   o:1,p:1,d:1},
-  {name:'NPH',       o:2,p:2,d:2},
-  {name:'Glargine',  o:3,p:3,d:3},
-  {name:'Detemir',   o:3,p:3,d:3}
+// 5 curve types. Rapids share one curve/color.
+var CURVES = [
+  { id:'rapid',    color:'#E8523A', peak:1,   peakH:1.0,  sig:0.35 },
+  { id:'regular',  color:'#F0A500', peak:3,   peakH:0.82, sig:0.45 },
+  { id:'nph',      color:'#2BBFA4', peak:8,   peakH:0.68, sig:0.55 },
+  { id:'longact',  color:'#378ADD', peak:12,  peakH:0.32, sig:1.05 }
 ];
-var ONSETS=['15 min','30–60 min','1–2 hrs','1–4 hrs'];
-var PEAKS=['1–3 hrs','2–4 hrs','4–12 hrs','No peak'];
-var DURS=['3–5 hrs','5–8 hrs','14–24 hrs','24 hrs'];
 
-var deck=[],cardIdx=0,cur=null;
-var sel=[0,0,0];
-var frozen=[false,false,false];
-var locked=false,done=false;
-var firstTryWrong=false;
-var correctCount=0,missedCount=0,totalChecks=0;
+var CARDS = [
+  {name:'Lispro',    curve:0},
+  {name:'Aspart',    curve:0},
+  {name:'Glulisine', curve:0},
+  {name:'Regular',   curve:1},
+  {name:'NPH',       curve:2},
+  {name:'Glargine',  curve:3},
+  {name:'Detemir',   curve:3}
+];
+
+var THRESHOLD = 0.018; // draw only where curve is above this
+
+function curveY(c, t) {
+  if(t <= 0) return 0;
+  var mu = Math.log(c.peak);
+  var val = Math.exp(-Math.pow(Math.log(t) - mu, 2) / (2*c.sig*c.sig));
+  return c.peakH * val;
+}
+
+// Find t where curve crosses threshold, searching between tMin and tMax
+function findThresholdT(c, tMin, tMax, rising) {
+  for(var i=0; i<60; i++){
+    var mid = (tMin+tMax)/2;
+    var y = curveY(c, mid);
+    if(rising) { if(y < THRESHOLD) tMin=mid; else tMax=mid; }
+    else        { if(y > THRESHOLD) tMin=mid; else tMax=mid; }
+  }
+  return (tMin+tMax)/2;
+}
+
+
+
+
+var deck=[], cardIdx=0, cur=null;
+var firstTryWrong=false, done=false;
+var correctCount=0, missedCount=0, totalChecks=0;
 
 function shuffle(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
 
-function init(){
-  deck=shuffle(CARDS);cardIdx=0;correctCount=0;missedCount=0;totalChecks=0;
-  firstTryWrong=false;frozen=[false,false,false];sel=[0,0,0];locked=false;done=false;cur=deck[0];
-  document.getElementById('quizView').style.display='flex';
-  document.getElementById('resultsView').style.display='none';
-  document.getElementById('submitBtn').style.display='block';
-  document.getElementById('nextBtn').style.display='none';
-  document.getElementById('card').className='card';
-  clearWheelStates();render();updateProgress();
+
+
+
+// Log-normal style curve — smooth natural taper, no hard cutoffs
+function curveY(c, t) {
+  if(t <= 0) return 0;
+  if(c.flat) {
+    // long-acting: very gentle, wide, low arch — no hard edges
+    var mu = Math.log(c.peak);
+    var sig = 1.1;
+    var val = Math.exp(-Math.pow(Math.log(t) - mu, 2) / (2*sig*sig));
+    return c.peakH * val;
+  }
+  // skewed bell via log-normal
+  var mu = Math.log(c.peak);
+  var sig = c.sig || 0.55;
+  var val = Math.exp(-Math.pow(Math.log(t) - mu, 2) / (2*sig*sig));
+  return c.peakH * val;
 }
 
-function render(){
-  if(!cur)return;
-  document.getElementById('cardName').textContent=cur.name;
-  document.getElementById('wt0').textContent=ONSETS[sel[0]];
-  document.getElementById('wt1').textContent=PEAKS[sel[1]];
-  document.getElementById('wt2').textContent=DURS[sel[2]];
+function drawGraph(highlightIdx) {
+  var canvas = document.getElementById('graphCanvas');
+  var W = canvas.offsetWidth || 380;
+  canvas.width = W;
+  var H = canvas.height;
+  var ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  var padL=8, padR=8, padT=10, padB=44;
+  var gW = W - padL - padR;
+  var gH = H - padT - padB;
+
+  // axes
+  ctx.strokeStyle='#ddd';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT);
+  ctx.lineTo(padL, padT+gH);
+  ctx.lineTo(padL+gW, padT+gH);
+  ctx.stroke();
+
+  // hour ticks + numbers
+  ctx.fillStyle='#bbb';
+  ctx.font='bold 10px system-ui';
+  ctx.textAlign='center';
+  [0,4,8,12,16,20,24].forEach(function(h){
+    var x = padL + (h/24)*gW;
+    ctx.beginPath();
+    ctx.moveTo(x, padT+gH);
+    ctx.lineTo(x, padT+gH+5);
+    ctx.strokeStyle='#ccc';
+    ctx.lineWidth=1;
+    ctx.stroke();
+    ctx.fillText(h, x, padT+gH+17);
+  });
+
+  // "Hours" label
+  ctx.fillStyle='#ccc';
+  ctx.font='bold 9px system-ui';
+  ctx.fillText('HOURS', padL + gW/2, padT+gH+32);
+
+  // draw each curve only within the range where y > THRESHOLD
+  CURVES.forEach(function(c, idx){
+    var alpha = 1, lw = 2.5;
+    if(highlightIdx !== null && highlightIdx !== undefined) {
+      if(idx === highlightIdx) { lw = 3.5; alpha = 1; }
+      else { alpha = 0.15; lw = 2; }
+    }
+
+    // find where curve rises above and falls below threshold
+    var tRise = findThresholdT(c, 0.01, c.peak, true);
+    var tFall = findThresholdT(c, c.peak, 24, false);
+
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = c.color;
+    ctx.lineWidth = lw;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    var steps = 400;
+    var first = true;
+    for(var s=0; s<=steps; s++){
+      var t = tRise + (s/steps)*(tFall - tRise);
+      var y = curveY(c, t);
+      var px = padL + (t/24)*gW;
+      var py = padT + gH - y*gH*0.88;
+      if(first){ ctx.moveTo(px, py); first=false; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
 }
 
-function cycle(w,dir){
-  if(done||frozen[w])return;
-  var lens=[ONSETS.length,PEAKS.length,DURS.length];
-  sel[w]=(sel[w]+dir+lens[w])%lens[w];
-  document.getElementById('w'+w).className='wheel-window';
-  render();
+function buildColorBtns(){
+  var wrap = document.getElementById('colorBtns');
+  wrap.innerHTML='';
+  CURVES.forEach(function(c, idx){
+    var btn = document.createElement('button');
+    btn.className='cbtn';
+    btn.id='cbtn'+idx;
+    btn.innerHTML='<div class="dot" style="background:'+c.color+'"></div>';
+    btn.onclick=(function(i){return function(){onColorPick(i);};})(idx);
+    wrap.appendChild(btn);
+  });
 }
 
-function clearWheelStates(){
-  for(var i=0;i<3;i++){
-    document.getElementById('w'+i).className='wheel-window';
-    document.getElementById('u'+i).disabled=false;
-    document.getElementById('d'+i).disabled=false;
-    frozen[i]=false;
+function onColorPick(idx){
+  if(done) return;
+  totalChecks++;
+  var correct = cur.curve;
+  if(idx === correct){
+    done = true;
+    if(!firstTryWrong) correctCount++; else missedCount++;
+    document.getElementById('card').className='card correct';
+    // highlight correct curve
+    drawGraph(correct);
+    // mark button
+    document.getElementById('cbtn'+idx).classList.add('selected');
+    disableBtns();
+    confetti();
+    document.getElementById('nextBtn').style.display='block';
+    document.getElementById('nextBtn').textContent=(cardIdx+1>=7)?'See Results →':'Next Insulin →';
+  } else {
+    firstTryWrong = true;
+    var card = document.getElementById('card');
+    card.className='card wrong';
+    setTimeout(function(){card.className='card';},400);
+    // briefly highlight wrong pick
+    drawGraph(idx);
+    setTimeout(function(){if(!done)drawGraph(null);},600);
   }
 }
 
-function freezeWheel(w){
-  frozen[w]=true;
-  document.getElementById('w'+w).className='wheel-window ok';
-  document.getElementById('u'+w).disabled=true;
-  document.getElementById('d'+w).disabled=true;
+function disableBtns(){
+  for(var i=0;i<CURVES.length;i++){
+    var b=document.getElementById('cbtn'+i);
+    if(b) b.disabled=true;
+  }
 }
 
 function updateProgress(){
@@ -182,34 +281,18 @@ function updateProgress(){
   document.getElementById('progLbl').textContent=cardIdx+' / 7';
 }
 
-function submit(){
-  if(locked||done)return;
-  totalChecks++;
-  var c=cur;
-  var r0=sel[0]===c.o,r1=sel[1]===c.p,r2=sel[2]===c.d;
-  var allOk=r0&&r1&&r2;
-  if(allOk){
-    if(!firstTryWrong)correctCount++;else missedCount++;
-    done=true;
-    document.getElementById('card').className='card correct';
-    freezeWheel(0);freezeWheel(1);freezeWheel(2);
-    confetti();
-    document.getElementById('submitBtn').style.display='none';
-    document.getElementById('nextBtn').style.display='block';
-    document.getElementById('nextBtn').textContent=(cardIdx+1>=7)?'See Results →':'Next Insulin →';
-  } else {
-    if(!firstTryWrong)firstTryWrong=true;
-    locked=true;
-    if(r0)freezeWheel(0);else document.getElementById('w0').className='wheel-window no';
-    if(r1)freezeWheel(1);else document.getElementById('w1').className='wheel-window no';
-    if(r2)freezeWheel(2);else document.getElementById('w2').className='wheel-window no';
-    setTimeout(function(){
-      locked=false;
-      if(!frozen[0])document.getElementById('w0').className='wheel-window';
-      if(!frozen[1])document.getElementById('w1').className='wheel-window';
-      if(!frozen[2])document.getElementById('w2').className='wheel-window';
-    },700);
-  }
+function init(){
+  deck=shuffle(CARDS);cardIdx=0;
+  correctCount=0;missedCount=0;totalChecks=0;
+  done=false;firstTryWrong=false;cur=deck[0];
+  document.getElementById('quizView').style.display='flex';
+  document.getElementById('resultsView').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  document.getElementById('card').className='card';
+  buildColorBtns();
+  document.getElementById('cardName').textContent=cur.name;
+  updateProgress();
+  setTimeout(function(){drawGraph(null);},50);
 }
 
 function nextCard(){
@@ -218,11 +301,12 @@ function nextCard(){
   updateProgress();
   if(cardIdx>=7){showResults();return;}
   cur=deck[cardIdx];
-  firstTryWrong=false;done=false;sel=[0,0,0];
+  done=false;firstTryWrong=false;
   document.getElementById('card').className='card';
-  document.getElementById('submitBtn').style.display='block';
   document.getElementById('nextBtn').style.display='none';
-  clearWheelStates();render();
+  document.getElementById('cardName').textContent=cur.name;
+  buildColorBtns();
+  drawGraph(null);
 }
 
 function showResults(){
